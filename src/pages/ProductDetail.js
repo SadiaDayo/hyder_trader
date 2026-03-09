@@ -10,6 +10,8 @@ const ProductDetail = () => {
   const { addToCart, cart } = useContext(AppContext);
   const { addToast } = useToast();
 
+  const API_BASE = process.env.REACT_APP_API_URL || "http://localhost:5000";
+
   const product = products.find((p) => p.id === Number(id));
 
   const [quantity, setQuantity] = useState(1);
@@ -17,24 +19,28 @@ const ProductDetail = () => {
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
   const [productReviews, setProductReviews] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchReviews = async () => {
+      if (!id) return;
+      setLoading(true);
       try {
-        const API_URL = process.env.REACT_APP_API_URL;
-        const res = await fetch(`${API_URL}/api/reviews/${id}`);
+        const res = await fetch(`${API_BASE}/api/reviews/product/${id}`);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
         setProductReviews(Array.isArray(data) ? data : []);
-      } catch (error) {
-        console.error("Failed to fetch reviews:", error);
+      } catch (err) {
+        console.error("Reviews fetch failed:", err);
+        addToast("Could not load reviews", "error", 3000);
         setProductReviews([]);
+      } finally {
+        setLoading(false);
       }
     };
 
-    if (id) {
-      fetchReviews();
-    }
-  }, [id]);
+    fetchReviews();
+  }, [id, API_BASE, addToast]);
 
   const cartItem = cart.find((item) => item.id === Number(id));
   const cartQty = cartItem ? cartItem.quantity || 0 : 0;
@@ -45,12 +51,10 @@ const ProductDetail = () => {
 
   useEffect(() => {
     if (!product) return;
-
     if (isOutOfStock || remainingStock <= 0) {
       setQuantity(1);
       return;
     }
-
     setQuantity((q) => Math.min(q, remainingStock));
   }, [product, isOutOfStock, remainingStock]);
 
@@ -65,69 +69,54 @@ const ProductDetail = () => {
 
   const averageRating =
     productReviews.length > 0
-      ? (
-          productReviews.reduce((sum, r) => sum + r.rating, 0) /
+      ? (productReviews.reduce((sum, r) => sum + Number(r.rating || 0), 0) /
           productReviews.length
         ).toFixed(1)
       : "—";
 
   const handleAddToCart = () => {
     if (isOutOfStock) {
-      addToast("This product is currently out of stock", "warning", 3000);
+      addToast("Out of stock", "warning", 3000);
       return;
     }
-
     if (remainingStock <= 0) {
-      addToast("You already added all available stock to cart", "warning", 3000);
+      addToast("Stock limit reached in cart", "warning", 3000);
       return;
     }
-
     if (quantity > remainingStock) {
-      addToast(`Only ${remainingStock} more item(s) available`, "warning", 3000);
+      addToast(`Only ${remainingStock} available`, "warning", 3000);
       setQuantity(remainingStock);
       return;
     }
-
     addToCart({ ...product, quantity });
-    addToast(`Added ${quantity} × ${product.name} to cart`, "success", 3500);
+    addToast(`Added ${quantity} × ${product.name}`, "success", 3500);
   };
 
   const handleReviewSubmit = async () => {
-    if (!reviewName.trim()) {
-      addToast("Please enter your name", "warning", 3000);
-      return;
-    }
+    const trimmedName = reviewName.trim();
+    const trimmedComment = comment.trim();
 
-    if (rating === 0) {
-      addToast("Please select a rating", "warning", 3000);
-      return;
-    }
-
-    if (!comment.trim()) {
-      addToast("Please write a review comment", "warning", 3000);
-      return;
-    }
+    if (!trimmedName) return addToast("Name required", "warning", 3000);
+    if (rating === 0) return addToast("Select rating", "warning", 3000);
+    if (!trimmedComment) return addToast("Comment required", "warning", 3000);
 
     try {
-      const API_URL = process.env.REACT_APP_API_URL;
-      const res = await fetch(`${API_URL}/api/reviews`, {
+      const res = await fetch(`${API_BASE}/api/reviews`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           productId: Number(id),
           productName: product.name,
-          name: reviewName,
-          rating,
-          comment,
+          name: trimmedName,
+          rating: Number(rating),
+          comment: trimmedComment,
         }),
       });
 
       const data = await res.json();
 
       if (!res.ok) {
-        addToast(data.message || "Failed to submit review", "error", 3000);
+        addToast(data.message || "Submit failed", "error", 3000);
         return;
       }
 
@@ -138,166 +127,86 @@ const ProductDetail = () => {
       setReviewName("");
       setRating(0);
       setComment("");
-      addToast("Review submitted successfully", "success", 4000);
-    } catch (error) {
-      console.error("Review submit error:", error);
-      addToast("Server error while saving review", "error", 3000);
+      addToast("Review submitted!", "success", 4000);
+    } catch (err) {
+      console.error("Submit error:", err);
+      addToast("Server error", "error", 3000);
     }
   };
 
   return (
     <div className="product-detail-container">
+      {/* Product main section - unchanged */}
       <div className="product-main">
         <div className="product-image">
           <img src={product.image} alt={product.name} />
         </div>
-
         <div className="product-content">
           <h1>{product.name}</h1>
-
-          <p className="description">
-            {product.description || "No description available."}
-          </p>
-
+          <p className="description">{product.description || "No description available."}</p>
           <div className="meta">
-            <span>
-              Brand: <strong>{product.company || "—"}</strong>
-            </span>
-            <span>
-              Category: <strong>{product.category || "—"}</strong>
-            </span>
+            <span>Brand: <strong>{product.company || "—"}</strong></span>
+            <span>Category: <strong>{product.category || "—"}</strong></span>
           </div>
-
           <div className="price-rating">
-            <div className="price">
-              PKR {product.price.toLocaleString("en-PK")}
-            </div>
-
-            <div className="rating-display">
-              {averageRating} ★ {productReviews.length} reviews
-            </div>
+            <div className="price">PKR {product.price.toLocaleString("en-PK")}</div>
+            <div className="rating-display">{averageRating} ★ {productReviews.length} reviews</div>
           </div>
-
           <div className="stock-row">
             <span className={`stock-badge ${isOutOfStock ? "out" : "in"}`}>
               {isOutOfStock ? "Out of Stock" : "In Stock"}
             </span>
-
-            <span className="stock-qty">
-              Total Stock: <b>{maxQty}</b>
-            </span>
-
+            <span className="stock-qty">Total Stock: <b>{maxQty}</b></span>
             {!isOutOfStock && (
-              <span className="stock-qty">
-                Available to Add: <b>{remainingStock}</b>
-              </span>
+              <span className="stock-qty">Available to Add: <b>{remainingStock}</b></span>
             )}
           </div>
-
           <div className="actions">
             <div className="quantity">
-              <button
-                onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                disabled={isOutOfStock || remainingStock <= 0}
-              >
-                -
-              </button>
-
+              <button onClick={() => setQuantity(q => Math.max(1, q - 1))} disabled={isOutOfStock || remainingStock <= 0}>-</button>
               <span>{quantity}</span>
-
-              <button
-                onClick={() =>
-                  setQuantity((q) => {
-                    if (isOutOfStock || remainingStock <= 0) return 1;
-                    return Math.min(remainingStock, q + 1);
-                  })
-                }
-                disabled={isOutOfStock || remainingStock <= 0}
-              >
-                +
-              </button>
+              <button onClick={() => setQuantity(q => Math.min(remainingStock, q + 1))} disabled={isOutOfStock || remainingStock <= 0}>+</button>
             </div>
-
-            <button
-              className={`add-cart ${isOutOfStock || remainingStock <= 0 ? "disabled" : ""}`}
-              onClick={handleAddToCart}
-              disabled={isOutOfStock || remainingStock <= 0}
-            >
-              {isOutOfStock
-                ? "Out of Stock"
-                : remainingStock <= 0
-                ? "Stock Limit Reached"
-                : "Add to Cart"}
+            <button className={`add-cart ${isOutOfStock || remainingStock <= 0 ? "disabled" : ""}`} onClick={handleAddToCart} disabled={isOutOfStock || remainingStock <= 0}>
+              {isOutOfStock ? "Out of Stock" : remainingStock <= 0 ? "Stock Limit Reached" : "Add to Cart"}
             </button>
           </div>
         </div>
       </div>
 
+      {/* Reviews section */}
       <div className="reviews-section">
         <h2>Customer Reviews ({productReviews.length})</h2>
 
         <div className="review-form">
           <h3>Write a Review</h3>
-
-          <input
-            type="text"
-            className="review-name-input"
-            placeholder="Enter your name"
-            value={reviewName}
-            onChange={(e) => setReviewName(e.target.value)}
-          />
-
+          <input type="text" placeholder="Your name" value={reviewName} onChange={e => setReviewName(e.target.value)} />
           <div className="rating-select">
             <label>Rating:</label>
-
-            <select
-              value={rating}
-              onChange={(e) => setRating(Number(e.target.value))}
-            >
+            <select value={rating} onChange={e => setRating(Number(e.target.value))}>
               <option value={0}>Select...</option>
-              <option value={5}>5 ★★★★★</option>
-              <option value={4}>4 ★★★★☆</option>
-              <option value={3}>3 ★★★☆☆</option>
-              <option value={2}>2 ★★☆☆☆</option>
-              <option value={1}>1 ★☆☆☆☆</option>
+              {[5,4,3,2,1].map(n => <option key={n} value={n}>{n} ★{'★'.repeat(n-1)}</option>)}
             </select>
           </div>
-
-          <textarea
-            placeholder="Share your thoughts about this product..."
-            value={comment}
-            onChange={(e) => setComment(e.target.value)}
-            rows={4}
-          />
-
-          <button onClick={handleReviewSubmit} className="submit-review">
-            Submit Review
-          </button>
+          <textarea placeholder="Your thoughts..." value={comment} onChange={e => setComment(e.target.value)} rows={4} />
+          <button onClick={handleReviewSubmit} className="submit-review">Submit Review</button>
         </div>
 
         <div className="reviews-list">
-          {productReviews.length === 0 ? (
-            <p>No reviews yet. Be the first to review!</p>
+          {loading ? (
+            <p>Loading reviews...</p>
+          ) : productReviews.length === 0 ? (
+            <p>No reviews yet. Be the first!</p>
           ) : (
-            productReviews.map((review) => (
-              <div
-                key={review.id || `${review.date}-${review.comment}`}
-                className="review-item"
-              >
+            productReviews.map(review => (
+              <div key={review.id} className="review-item">
                 <div className="review-header">
                   <div className="review-user-block">
-                    <strong className="reviewer-name">
-                      {review.name || "Anonymous User"}
-                    </strong>
-                    <span className="stars">
-                      {"★".repeat(review.rating)}
-                      {"☆".repeat(5 - review.rating)}
-                    </span>
+                    <strong>{review.name || "Anonymous"}</strong>
+                    <span className="stars">{"★".repeat(Number(review.rating))}{"☆".repeat(5 - Number(review.rating))}</span>
                   </div>
-
-                  <span className="date">{review.date || "—"}</span>
+                  <span className="date">{review.date}</span>
                 </div>
-
                 <p>{review.comment}</p>
               </div>
             ))

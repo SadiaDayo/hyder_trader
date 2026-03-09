@@ -10,10 +10,12 @@ const Shop = () => {
   const { searchQuery, setSearchQuery } = useContext(AppContext);
   const { addToast } = useToast();
   const location = useLocation();
-  const API_URL = process.env.REACT_APP_API_URL;
+
+  const API_BASE = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
   const [filtered, setFiltered] = useState(products);
   const [allReviews, setAllReviews] = useState([]);
+  const [loadingReviews, setLoadingReviews] = useState(true);
 
   const companies = [
     "All",
@@ -38,19 +40,25 @@ const Shop = () => {
 
   useEffect(() => {
     const fetchAllReviews = async () => {
+      setLoadingReviews(true);
       try {
-        if (!API_URL) return;
-        const res = await fetch(`${API_URL}/api/reviews`);
+        const res = await fetch(`${API_BASE}/api/reviews`);
+        if (!res.ok) {
+          throw new Error(`Server responded with status ${res.status}`);
+        }
         const data = await res.json();
         setAllReviews(Array.isArray(data) ? data : []);
       } catch (error) {
-        console.error("Failed to fetch reviews:", error);
+        console.error("Failed to fetch all reviews:", error);
+        addToast("Could not load product ratings", "error", 4000);
         setAllReviews([]);
+      } finally {
+        setLoadingReviews(false);
       }
     };
 
     fetchAllReviews();
-  }, [API_URL]);
+  }, [API_BASE, addToast]);
 
   const getAverageRating = (productId) => {
     const productReviews = allReviews.filter((r) => r.productId === productId);
@@ -150,7 +158,7 @@ const Shop = () => {
     }
 
     setFiltered(list);
-  }, [location.search, sortBy, inStockOnly, setSearchQuery]);
+  }, [location.search, sortBy, inStockOnly, saleOnly, setSearchQuery]);
 
   const updateQueryParams = (newCompany, newCategory, newSale = saleOnly) => {
     const params = new URLSearchParams(location.search);
@@ -303,7 +311,9 @@ const Shop = () => {
           filtered.map((p) => (
             <div key={p.id} className="product-wrapper">
               <ProductCard product={p} />
-              <div className="rating-below-card">{renderStars(p.id)}</div>
+              <div className="rating-below-card">
+                {loadingReviews ? "..." : renderStars(p.id)}
+              </div>
             </div>
           ))
         )}

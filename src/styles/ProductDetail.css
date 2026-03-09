@@ -322,38 +322,101 @@
     font-size: 1rem;
   }
 }
+/* Stock row - main container */
 .stock-row {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;           /* allow wrapping on very small screens */
   gap: 12px;
-  margin: 12px 0;
+  margin: 16px 0;            /* a bit more breathing room */
+  justify-content: flex-start; /* left-align on desktop, can change to center if you want */
 }
 
+/* Individual stock info pills */
 .stock-qty {
   font-size: 14px;
+  font-weight: 500;
   background: #f4f7fb;
-  padding: 6px 10px;
+  padding: 8px 16px;         /* more horizontal padding for centering */
   border-radius: 999px;
   border: 1px solid #e5ecf6;
+  display: inline-flex;      /* flex for perfect centering */
+  align-items: center;       /* vertical center */
+  justify-content: center;   /* horizontal center */
+  min-width: 110px;          /* consistent width so they look balanced */
+  text-align: center;        /* fallback for text */
+  white-space: nowrap;       /* prevent wrapping inside pill */
 }
 
+/* Make the number bold and slightly larger for emphasis */
+.stock-qty b {
+  font-weight: 700;
+  font-size: 15px;
+  color: #082644;
+  margin-left: 4px;
+}
+
+/* Badge (In Stock / Out of Stock) */
 .stock-badge {
-  padding: 7px 12px;
+  padding: 8px 16px;         /* match padding with .stock-qty for symmetry */
   border-radius: 999px;
   font-weight: 700;
   font-size: 13px;
+  min-width: 100px;          /* similar min-width */
+  text-align: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
+/* In Stock badge */
 .stock-badge.in {
   background: rgba(30, 155, 81, 0.12);
   color: #1e9b51;
   border: 1px solid rgba(30, 155, 81, 0.25);
 }
 
+/* Out of Stock badge */
 .stock-badge.out {
   background: rgba(209, 59, 59, 0.12);
   color: #d13b3b;
   border: 1px solid rgba(209, 59, 59, 0.25);
+}
+
+/* Disabled add-to-cart button (already good, just confirming) */
+.add-cart.disabled {
+  background: #999 !important;
+  cursor: not-allowed;
+  opacity: 0.85;
+}
+
+/* Mobile adjustments - make everything stack nicely and still centered */
+@media (max-width: 768px) {
+  .stock-row {
+    flex-direction: column;     /* stack vertically on tablet/mobile */
+    align-items: stretch;       /* full width */
+    gap: 10px;
+  }
+
+  .stock-qty,
+  .stock-badge {
+    width: 100%;                /* full width pills */
+    justify-content: center;
+    text-align: center;
+  }
+
+  .stock-qty b {
+    margin-left: 6px;
+  }
+}
+
+@media (max-width: 480px) {
+  .stock-qty,
+  .stock-badge {
+    font-size: 13px;
+    padding: 7px 14px;
+    min-width: auto;           /* allow natural width on very small screens */
+  }
 }
 .add-cart.disabled {
   background: #999 !important;
