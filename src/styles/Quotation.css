@@ -1,0 +1,169 @@
+/* ==========================================
+   Quotation Page
+   ========================================== */
+.quotation-page {
+  background: #f9fafb;
+  min-height: 100vh;
+  padding: 60px 20px 100px;
+}
+
+.quotation-container {
+  max-width: 700px;
+  margin: 0 auto;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+  padding: 40px 32px;
+}
+
+.quotation-container h1 {
+  font-family: 'Work Sans', sans-serif;
+  color: #082644;
+  font-size: 2.2rem;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+.subtitle {
+  text-align: center;
+  color: #6b7280;
+  font-size: 1.05rem;
+  margin-bottom: 40px;
+}
+
+/* Form */
+.quotation-form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-group label {
+  font-family: 'Work Sans', sans-serif;
+  font-weight: 600;
+  color: #082644;
+  font-size: 1rem;
+}
+
+.required {
+  color: #ef4444;
+  font-size: 0.95rem;
+}
+
+.form-group input,
+.form-group textarea {
+  padding: 14px 16px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1rem;
+  color: #1f2937;
+  background: #f9fafb;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: #FF8821;
+  box-shadow: 0 0 0 3px rgba(255, 136, 33, 0.1);
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 140px;
+}
+
+/* Submit Button */
+.btn-submit {
+  background: #FF8821;
+  color: white;
+  border: none;
+  padding: 16px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  margin-top: 16px;
+}
+
+.btn-submit:hover {
+  background: #082644;
+  transform: translateY(-2px);
+  color: #FF8821;
+}
+
+.btn-submit.loading {
+  background: #e07b1c;
+  cursor: not-allowed;
+}
+
+.btn-submit:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* Spinner (for submitting state) */
+.spinner {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border: 3px solid white;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-right: 10px;
+  vertical-align: middle;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Messages */
+.success-message {
+  margin-top: 24px;
+  padding: 16px;
+  background: #ecfdf5;
+  color: #065f46;
+  border-radius: 10px;
+  text-align: center;
+  font-weight: 500;
+}
+
+.error-message {
+  margin-top: 16px;
+  padding: 12px;
+  background: #fee2e2;
+  color: #991b1b;
+  border-radius: 8px;
+  text-align: center;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .quotation-container {
+    padding: 32px 20px;
+  }
+
+  .quotation-container h1 {
+    font-size: 2rem;
+  }
+
+  .quotation-form {
+    gap: 20px;
+  }
+
+  .btn-submit {
+    padding: 14px;
+    font-size: 1rem;
+  }
+}

@@ -1,0 +1,281 @@
+.about-container {
+  min-height: 80vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1rem;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+}
+
+.about-card {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 10px 40px rgba(8, 38, 68, 0.12);
+  padding: 3.5rem 2.5rem;
+  max-width: 900px;
+  width: 100%;
+  border: 1px solid #e0e7ff;
+}
+
+.about-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.about-header h1 {
+  font-family: 'Work Sans', sans-serif;
+  font-size: 2.8rem;
+  color: #082644;
+  margin: 0 0 0.8rem;
+  font-weight: 700;
+}
+
+.tagline {
+  font-family: 'JetBrains Mono', monospace;
+  color: #4a5568;
+  font-size: 1.2rem;
+  font-weight: 500;
+  margin: 0;
+}
+
+.about-content {
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+}
+
+.mission-section,
+.values-section,
+.why-us {
+  text-align: center;
+  justify-content: center;
+}
+
+.mission-section h2,
+.values-section h2,
+.why-us h2 {
+  font-family: 'Work Sans', sans-serif;
+  color: #082644;
+  font-size: 1.9rem;
+  margin-bottom: 1.2rem;
+  position: relative;
+  display: inline-block;
+}
+
+.mission-section h2::after,
+.values-section h2::after,
+.why-us h2::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 3px;
+  background: #FF8821;
+  border-radius: 2px;
+}
+
+.mission-section p,
+.why-us p {
+  font-family: 'JetBrains Mono', monospace;
+  color: #4a5568;
+  font-size: 1.05rem;
+  line-height: 1.7;
+  margin: 0 0 1.2rem;
+}
+
+/* Values Section - Overall */
+.values-section {
+  padding: 80px 20px;
+  background: #f9fafb;
+  text-align: center;
+}
+
+.values-section h2 {
+  font-family: 'Work Sans', sans-serif;
+  color: #082644;
+  font-size: 2.4rem;
+  font-weight: 700;
+  margin-bottom: 48px;
+}
+
+/* Values Grid - Flexbox for easy centering */
+.values-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;          /* This centers everything */
+  gap: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  
+}
+
+/* Each Value Card */
+.value-item {
+  flex: 0 1 300px;                  /* min width ~300px, grow a bit */
+  max-width: 360px;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+  padding: 32px 24px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  text-align: center;
+}
+
+.value-item:hover {
+ transform: translateY(-8px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+  border-color: #FF8821; 
+  
+}
+
+.value-icon {
+  display: block;
+  font-size: 3.5rem;
+  margin-bottom: 20px;
+  color: #FF8821;
+}
+
+.value-item h3 {
+  font-family: 'Work Sans', sans-serif;
+  color: #082644;
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+.value-item p {
+  font-family: 'JetBrains Mono', monospace;
+  color: #4b5563;
+  font-size: 0.98rem;
+  line-height: 1.6;
+}
+
+/* Responsive - Stack on smaller screens */
+@media (max-width: 1024px) {
+  .value-item {
+    flex: 0 1 280px;
+    max-width: 320px;
+  }
+}
+
+@media (max-width: 768px) {
+  .values-grid {
+    gap: 1.6rem;
+  }
+
+  .value-item {
+    flex: 1 1 100%;          /* Full width on mobile */
+    max-width: none;
+  }
+
+  .values-section h2 {
+    font-size: 2rem;
+  }
+}
+.why-us{
+    display: flex;
+    flex-direction: column;
+}
+.why-list {
+  list-style: none;
+  padding: 0;
+  max-width: 600px;
+  margin: 1.5rem auto 0;
+  text-align: left;
+}
+
+.why-list li {
+  font-family: 'JetBrains Mono', monospace;
+  color: #4a5568;
+  font-size: 1.05rem;
+  margin-bottom: 0.9rem;
+  position: relative;
+  padding-left: 1.8rem;
+}
+
+.why-list li::before {
+  content: "✔";
+  color: #FF8821;
+  position: absolute;
+  left: 0;
+  font-weight: bold;
+}
+
+.contact-cta {
+  text-align: center;
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid #e2e8f0;
+}
+
+.contact-cta p {
+  font-family: 'Work Sans', sans-serif;
+  color: #082644;
+  font-size: 1.3rem;
+  margin-bottom: 1.2rem;
+}
+
+.cta-button {
+  display: inline-block;
+  background: #FF8821;
+  color: white;
+  padding: 1rem 2.2rem;
+  border-radius: 10px;
+  text-decoration: none;
+  font-family: 'Work Sans', sans-serif;
+  font-weight: 600;
+  font-size: 1.15rem;
+  transition: all 0.3s;
+}
+
+.cta-button:hover {
+  background: #082644;
+  color:#FF8821;
+  transform: translateY(-3px);
+  box-shadow: 0 10px 30px rgba(255, 136, 33, 0.3);
+}
+
+/* ── Responsive Design ── */
+
+@media (max-width: 768px) {
+  .about-card {
+    padding: 2.5rem 1.8rem;
+  }
+
+  .about-header h1 {
+    font-size: 2.2rem;
+  }
+
+  .tagline {
+    font-size: 1.1rem;
+  }
+
+  .values-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .contact-cta p {
+    font-size: 1.2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .about-container {
+    padding: 1.5rem 0.8rem;
+  }
+
+  .about-card {
+    padding: 2rem 1.2rem;
+  }
+
+  .about-header h1 {
+    font-size: 1.9rem;
+  }
+
+  .cta-button {
+    padding: 0.9rem 1.8rem;
+    font-size: 1rem;
+  }
+}

@@ -1,0 +1,176 @@
+/* ==========================================
+   PREMIUM TOAST - Hyder Traders Enhanced
+   ========================================== */
+
+/* Container - Top Right */
+.toast-container {
+  position: fixed;
+  top: 1.5rem;
+  right: 1.5rem;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-width: 420px;
+}
+
+/* Base Toast - Navy Dark Background */
+.toast {
+  display: flex;
+  align-items: center;
+  gap: 1.1rem;
+  min-width: 320px;
+  padding: 1.2rem 1.5rem;
+  border-radius: 14px;
+  background: #082644 !important;
+  color: #ffffff !important;
+  font-family: 'JetBrains Mono', monospace !important;
+  font-size: 1rem !important;
+  font-weight: 500 !important;
+  box-shadow: 0 12px 40px rgba(8, 38, 68, 0.35) !important;
+  border: 1px solid rgba(255, 136, 33, 0.22) !important;
+  overflow: hidden;
+  position: relative;
+  animation: toastEnter 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  backdrop-filter: blur(8px);
+  transform-origin: top right;
+}
+
+/* Variants - Left Accent Border */
+.toast.success {
+  border-left: 6px solid #10b981 !important;      /* Success Green */
+}
+
+.toast.error {
+  border-left: 6px solid #ef4444 !important;      /* Error Red */
+}
+
+.toast.info {
+  border-left: 6px solid #3b82f6 !important;      /* Info Blue */
+}
+
+.toast.warning,
+.toast.add-wishlist {                             /* Wishlist uses brand orange */
+  border-left: 6px solid #FF8821 !important;      /* Brand Orange */
+}
+
+/* Progress Bar - Brand Orange Fill */
+.toast::before {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 4px;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.12);
+  z-index: 1;
+}
+
+.toast::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 4px;
+  width: 0%;
+  background: #FF8821;
+  animation: progressFill linear forwards;
+  animation-duration: 3.5s; /* match your toast duration */
+  z-index: 2;
+}
+
+/* Icon */
+.toast-icon {
+  font-size: 1.8rem;
+  font-weight: bold;
+  min-width: 32px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+/* Message */
+.toast-message {
+  flex: 1;
+  line-height: 1.5;
+  letter-spacing: 0.3px;
+}
+
+/* Close Button */
+.toast-close {
+  background: none;
+  border: none;
+  color: #ffffff !important;
+  font-size: 1.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: all 0.25s ease;
+  padding: 0 0.6rem;
+  z-index: 3;
+}
+
+.toast-close:hover {
+  opacity: 1;
+  transform: rotate(90deg) scale(1.2);
+}
+
+/* Animations */
+@keyframes toastEnter {
+  0% {
+    opacity: 0;
+    transform: translateX(120%) scale(0.92);
+  }
+  60% {
+    opacity: 1;
+    transform: translateX(0) scale(1.03);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+@keyframes progressFill {
+  from { width: 0%; }
+  to { width: 100%; }
+}
+
+/* Exit Animation (when toast is removed) */
+.toast.exit {
+  animation: toastExit 0.4s ease-in forwards;
+}
+
+@keyframes toastExit {
+  from {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(80%) scale(0.95);
+  }
+}
+
+/* Mobile Optimization */
+@media (max-width: 640px) {
+  .toast-container {
+    top: 1rem;
+    right: 0.8rem;
+    left: 0.8rem;
+    max-width: none;
+  }
+
+  .toast {
+    min-width: auto;
+    font-size: 0.95rem;
+    padding: 1rem 1.2rem;
+  }
+
+  .toast-icon {
+    font-size: 1.5rem;
+  }
+
+  .toast-close {
+    font-size: 1.6rem;
+  }
+}
