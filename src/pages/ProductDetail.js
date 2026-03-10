@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from "react";
+import React, { useContext, useState, useEffect, useRef } from "react";
 import { useParams, Link } from "react-router-dom";
 import { AppContext } from "../context/AppContext";
 import { useToast } from "../context/ToastContext";
@@ -20,31 +20,31 @@ const ProductDetail = () => {
   const [comment, setComment] = useState("");
   const [productReviews, setProductReviews] = useState([]);
   const [loadingReviews, setLoadingReviews] = useState(true);
-  const [hasShownErrorToast, setHasShownErrorToast] = useState(false);
 
-  // Fetch product reviews
+  const hasShownErrorToast = useRef(false);
+
   useEffect(() => {
     if (!id) return;
 
     const fetchReviews = async () => {
       setLoadingReviews(true);
-      setHasShownErrorToast(false); // reset toast flag on new fetch
 
       try {
         const res = await fetch(`${API_BASE}/api/reviews/product/${id}`);
+
         if (!res.ok) {
           throw new Error(`Server responded with status ${res.status}`);
         }
+
         const data = await res.json();
         setProductReviews(Array.isArray(data) ? data : []);
       } catch (err) {
         console.error("Failed to fetch reviews:", err.message);
         setProductReviews([]);
 
-        // Show toast only once per page load/session
-        if (!hasShownErrorToast) {
+        if (!hasShownErrorToast.current) {
           addToast("Could not load reviews. Please try again later.", "error", 5000);
-          setHasShownErrorToast(true);
+          hasShownErrorToast.current = true;
         }
       } finally {
         setLoadingReviews(false);
@@ -52,9 +52,8 @@ const ProductDetail = () => {
     };
 
     fetchReviews();
-  }, [id, API_BASE, addToast, hasShownErrorToast]);
+  }, [id, API_BASE, addToast]);
 
-  // Cart & stock logic
   const cartItem = cart.find((item) => item.id === Number(id));
   const cartQty = cartItem ? cartItem.quantity || 0 : 0;
 
@@ -64,10 +63,12 @@ const ProductDetail = () => {
 
   useEffect(() => {
     if (!product) return;
+
     if (isOutOfStock || remainingStock <= 0) {
       setQuantity(1);
       return;
     }
+
     setQuantity((q) => Math.min(q, remainingStock));
   }, [product, isOutOfStock, remainingStock]);
 
@@ -93,10 +94,12 @@ const ProductDetail = () => {
       addToast("This product is currently out of stock", "warning", 3000);
       return;
     }
+
     if (remainingStock <= 0) {
       addToast("You already added all available stock to cart", "warning", 3000);
       return;
     }
+
     if (quantity > remainingStock) {
       addToast(`Only ${remainingStock} more item(s) available`, "warning", 3000);
       setQuantity(remainingStock);
@@ -111,14 +114,27 @@ const ProductDetail = () => {
     const trimmedName = reviewName.trim();
     const trimmedComment = comment.trim();
 
-    if (!trimmedName) return addToast("Please enter your name", "warning", 3000);
-    if (rating === 0) return addToast("Please select a rating", "warning", 3000);
-    if (!trimmedComment) return addToast("Please write a review comment", "warning", 3000);
+    if (!trimmedName) {
+      addToast("Please enter your name", "warning", 3000);
+      return;
+    }
+
+    if (rating === 0) {
+      addToast("Please select a rating", "warning", 3000);
+      return;
+    }
+
+    if (!trimmedComment) {
+      addToast("Please write a review comment", "warning", 3000);
+      return;
+    }
 
     try {
       const res = await fetch(`${API_BASE}/api/reviews`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({
           productId: Number(id),
           productName: product.name,
@@ -158,6 +174,7 @@ const ProductDetail = () => {
 
         <div className="product-content">
           <h1>{product.name}</h1>
+
           <p className="description">
             {product.description || "No description available."}
           </p>
@@ -204,7 +221,9 @@ const ProductDetail = () => {
               >
                 -
               </button>
+
               <span>{quantity}</span>
+
               <button
                 onClick={() =>
                   setQuantity((q) => {
@@ -233,7 +252,6 @@ const ProductDetail = () => {
         </div>
       </div>
 
-      {/* Reviews Section */}
       <div className="reviews-section">
         <h2>Customer Reviews ({productReviews.length})</h2>
 
@@ -298,6 +316,7 @@ const ProductDetail = () => {
                   </div>
                   <span className="date">{review.date || "—"}</span>
                 </div>
+
                 <p className="review-comment">{review.comment}</p>
               </div>
             ))
