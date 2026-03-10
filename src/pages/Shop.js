@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import ProductCard from "../components/ProductCard";
 import { AppContext } from "../context/AppContext";
@@ -16,6 +16,8 @@ const Shop = () => {
   const [filtered, setFiltered] = useState(products);
   const [allReviews, setAllReviews] = useState([]);
   const [loadingReviews, setLoadingReviews] = useState(true);
+
+  const hasShownReviewError = useRef(false);
 
   const companies = [
     "All",
@@ -41,17 +43,24 @@ const Shop = () => {
   useEffect(() => {
     const fetchAllReviews = async () => {
       setLoadingReviews(true);
+
       try {
         const res = await fetch(`${API_BASE}/api/reviews`);
+
         if (!res.ok) {
           throw new Error(`Server responded with status ${res.status}`);
         }
+
         const data = await res.json();
         setAllReviews(Array.isArray(data) ? data : []);
       } catch (error) {
         console.error("Failed to fetch all reviews:", error);
-        addToast("Could not load product ratings", "error", 4000);
         setAllReviews([]);
+
+        if (!hasShownReviewError.current) {
+          addToast("Could not load product ratings", "error", 4000);
+          hasShownReviewError.current = true;
+        }
       } finally {
         setLoadingReviews(false);
       }
@@ -61,7 +70,7 @@ const Shop = () => {
   }, [API_BASE, addToast]);
 
   const getAverageRating = (productId) => {
-    const productReviews = allReviews.filter((r) => r.productId === productId);
+    const productReviews = allReviews.filter((r) => Number(r.productId) === Number(productId));
 
     if (productReviews.length === 0) return 0;
 
@@ -70,7 +79,7 @@ const Shop = () => {
   };
 
   const getReviewCount = (productId) => {
-    return allReviews.filter((r) => r.productId === productId).length;
+    return allReviews.filter((r) => Number(r.productId) === Number(productId)).length;
   };
 
   const renderStars = (productId) => {
@@ -114,7 +123,7 @@ const Shop = () => {
       setSearchQuery("");
     }
 
-    let list = products;
+    let list = [...products];
 
     const companyToUse = urlCompany || "All";
     const categoryToUse = urlCategory || "All";
@@ -148,13 +157,13 @@ const Shop = () => {
     }
 
     if (sortBy === "newest") {
-      list = [...list].sort((a, b) => (b.id || 0) - (a.id || 0));
+      list.sort((a, b) => (b.id || 0) - (a.id || 0));
     } else if (sortBy === "priceLow") {
-      list = [...list].sort((a, b) => (a.price || 0) - (b.price || 0));
+      list.sort((a, b) => (a.price || 0) - (b.price || 0));
     } else if (sortBy === "priceHigh") {
-      list = [...list].sort((a, b) => (b.price || 0) - (a.price || 0));
+      list.sort((a, b) => (b.price || 0) - (a.price || 0));
     } else if (sortBy === "nameAZ") {
-      list = [...list].sort((a, b) => (a.name || "").localeCompare(b.name || ""));
+      list.sort((a, b) => (a.name || "").localeCompare(b.name || ""));
     }
 
     setFiltered(list);
@@ -312,7 +321,7 @@ const Shop = () => {
             <div key={p.id} className="product-wrapper">
               <ProductCard product={p} />
               <div className="rating-below-card">
-                {loadingReviews ? "..." : renderStars(p.id)}
+                {loadingReviews ? "Loading..." : renderStars(p.id)}
               </div>
             </div>
           ))
