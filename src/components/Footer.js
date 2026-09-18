@@ -51,7 +51,7 @@ const Footer = () => {
           <h4>Follow Us</h4>
           <div className="social-icons">
             <a 
-              href="https://facebook.com/hydertraders" 
+              href="https://facebook.com/" 
               target="_blank" 
               rel="noopener noreferrer" 
               className="social-link facebook"
@@ -59,7 +59,7 @@ const Footer = () => {
               <FaFacebookF />
             </a>
             <a 
-              href="https://instagram.com/hydertraders" 
+              href="https://instagram.com/" 
               target="_blank" 
               rel="noopener noreferrer" 
               className="social-link instagram"
@@ -75,7 +75,7 @@ const Footer = () => {
               <FaWhatsapp />
             </a>
             <a 
-              href="https://youtube.com/@hydertraders" 
+              href="https://youtube.com/" 
               target="_blank" 
               rel="noopener noreferrer" 
               className="social-link youtube"
